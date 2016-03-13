@@ -1,28 +1,5 @@
 import numpy as np
 
-class picture:
-	import Image
-	pixels = np.array(None)
-	label = 0
-
-	def random_normal(self):
-		size = self.pixels.shape[0]**2
-		pixels = np.random.normal(size)
-		pixels = np.reshape(self.pixels,[size ** 0.5, size ** 0.5])
-
-	def random_empty(self):
-		self.random_normal()
-		for i in range(self.pixels.shape[0]):
-			self.pixels[0][i]=0
-	
-	def __init__(self,width=28,height=28,label = 0):
-		self.pixels = np.zeros([width,height],"float")	
-		self.label = label
-		if label == 0:
-			random_normal()
-		elif label == 1:
-			random_empty()
-
 class Symbol:
     import Image
 
@@ -46,8 +23,13 @@ class Stock(Symbol):
 	import datetime
 	
 	dates=[]
-	star_year=1962
 	path = "storage/"
+	verbose = True
+
+	def show(self):
+		import matplotlib.pyplot as plt
+		plt.plot(self.Y[0][::-1])
+		plt.show()
 
 	def save(self,text):
 		text_file= open("%s%s.cvs"%(self.path,self.name),'w')
@@ -62,15 +44,26 @@ class Stock(Symbol):
 		date = self.datetime.datetime.now()
 
 		start=time.time()
-		content = self.urllib2.urlopen("http://real-chart.finance.yahoo.com/table.csv?s=%s&d=1&e=%d&f=%d&g=%d&a=0&b=2&c=%d&ignore=.csv" %(self.name,date.month-1,date.day,date.year,self.start_year))
+		down_location = "http://real-chart.finance.yahoo.com/table.csv?s=%s&d=%d&e=%d&f=%d&g=d&a=%d&b=%d&c=%d&ignore=.csv" %(self.name,self.end_date.month-1,self.end_date.day-1,self.end_date.year,self.start_date.month-1,self.start_date.day-1,self.start_date.year)	
+		content = self.urllib2.urlopen(down_location)
 		
 		#self.save(content.read())
 		self.Y=np.genfromtxt(self.StringIO(content.read()),delimiter=',',skip_header = 1)
-		self.Y= np.transpose(np.transpose(self.Y)[1:7])
-		print "Fetched in %f seconds" % (time.time()-start)
+		self.Y= (np.transpose(self.Y)[1:7])[::-1]
+		if self.verbose:
+			print down_location
+			print "Fetched in %f seconds" % (time.time()-start)
 	
-	def __init__(self,name="GOOG",start_year=1962):
-		self.start_year=start_year
+	def __init__(self,name="GOOG",start_date=None,end_date=None,verbose=True):
+		self.verbose = verbose
+		if start_date == None:
+			self.start_date = self.datetime.datetime(1962,1,3)
+		else:
+			self.start_date = start_date
+		if end_date == None:
+			self.end_date = self.datetime.datetime.now()
+		else:
+			self.end_date = end_date
 		self.name=name
 		self.fetch()
 
