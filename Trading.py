@@ -36,6 +36,8 @@ class Stock(Symbol):
 		text_file.write(text)
 		text_file.close()
 		
+	def get_vol(self):
+		return ((self.Y[3]-self.Y[0])/self.Y[3])
 	
 	def fetch(self):
 		import time
@@ -49,7 +51,8 @@ class Stock(Symbol):
 		
 		#self.save(content.read())
 		self.Y=np.genfromtxt(self.StringIO(content.read()),delimiter=',',skip_header = 1)
-		self.Y= (np.transpose(self.Y)[1:7])[::-1]
+		self.Y = self.Y[::-1]
+		self.Y= (np.transpose(self.Y)[1:7])
 		if self.verbose:
 			print down_location
 			print "Fetched in %f seconds" % (time.time()-start)
