@@ -1,8 +1,12 @@
 import numpy as np
 class audio:
-    def reshape(self,  depth = 20):
-        self.train = np.array([[self.stream[0][y] for y in range(x,depth+x,1)] for x in range(0,len(self.stream[0])-1-depth,depth)])
-        self.length = len(self.train)
+	def reshape(self,  depth = 20):
+		if stereo:
+	        self.train = np.array([[self.stream[0][y] for y in range(x,depth+x,1)] for x in range(0,len(self.stream[0])-1-depth,depth)])
+	        self.length = len(self.train)
+	    else:
+	    	self.train = np.array([[self.stream[y] for y in range(x,depth+x,1)] for x in range(0,len(self.stream)-1-depth,depth)])
+	        self.length = len(self.train)
 
 	def ratio(self):
 		self.train_ratio = self.train/self.max
@@ -12,10 +16,15 @@ class audio:
         
     def show(self):
         import matplotlib.pyplot as plot
-        plot.plot([self.stream[0][i] for i in range(0,len(self.stream),1000)])
-        plot.show()
+        if stereo:
+	        plot.plot([self.stream[0][i] for i in range(0,len(self.stream),1000)])
+	        plot.show()
+	    else:
+	    	plot.plot([self.stream[i] for i in range(0,len(self.stream),1000)])
+	        plot.show()
         
-    def __init__(self,name = "noise.wav", bit = 16):
+    def __init__(self,name = "noise.wav", bit = 16, stereo = True):
+    	self.stereo = stereo
         self.max = float (2**(bit-1)-1)
         self.name = name
         from scipy.io.wavfile import read
